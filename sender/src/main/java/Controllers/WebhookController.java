@@ -15,7 +15,7 @@ public class WebhookController {
     public WebhookController(KafkaTemplate<String, CommitEvent> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
     }
-    
+
     @PostMapping("/commit")
     public String handleCommit(@RequestBody CommitEvent event){
         System.out.println("Commit event for: " + event.repositoryName());
