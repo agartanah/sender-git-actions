@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>ru.gnivc</groupId>
-	<artifactId>sender</artifactId>
+	<artifactId>webhook-receiver</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>sender</name>
 	<description>Sender for git actions</description>

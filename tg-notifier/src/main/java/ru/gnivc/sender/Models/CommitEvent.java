@@ -1,4 +1,4 @@
-package models;
+package ru.gnivc.sender.Models;
 
 public record CommitEvent(
         String repositoryName,
