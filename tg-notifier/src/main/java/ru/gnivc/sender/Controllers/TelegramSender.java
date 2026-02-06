@@ -16,10 +16,6 @@ public class TelegramSender extends TelegramLongPollingBot {
         super(token);
         this.BOT_TOKEN=token;
         this.CHAT_ID=chatId;
-
-        System.out.println("=== Telegram Bot Config ===");
-        System.out.println("Token: " + (token != null ? "SET" : "NULL"));
-        System.out.println("Chat ID: " + chatId);
     }
 
     @Override
@@ -36,7 +32,7 @@ public class TelegramSender extends TelegramLongPollingBot {
         message.setText(text);
         try{
             execute(message);
-            System.out.println("✅ Message sent successfully!");
+            System.out.println("Try to sent message");
         } catch (TelegramApiException e){
             System.err.println("Failed to send message: " + e.getMessage());
         }
