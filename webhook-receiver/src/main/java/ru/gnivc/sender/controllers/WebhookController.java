@@ -5,28 +5,42 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ru.gnivc.sender.models.CommitEvent;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
+import ru.gnivc.sender.models.PullRequestEvent;
 
 @RestController
-@RequestMapping("/webhook")
+@RequestMapping("/api/1")
 public class WebhookController {
-    private final KafkaTemplate<String, String> kafkaTemplate;
-    private final ObjectMapper objectMapper = new ObjectMapper();
-    private static final String KAFKA_TOPIC = "git-notifications";
+    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final ObjectMapper objectMapper;
+    private static final String KAFKA_TOPIC_BASE = "git.";
+    private static final String EVENT_KEY = "default_notification_key";
 
-    public WebhookController(KafkaTemplate<String, String> kafkaTemplate) {
+    public WebhookController(KafkaTemplate<String, Object> kafkaTemplate, ObjectMapper objectMapper) {
         this.kafkaTemplate = kafkaTemplate;
+        this.objectMapper = objectMapper;
     }
 
-    @PostMapping("/commit")
-    public String handleCommit(@RequestBody CommitEvent event){
-        System.out.println("Commit event for: " + event.repositoryName());
-
+    private <T> String handleAndSend(String gitEventType, String payloadJson, Class<T> eventClass){
         try{
-            String eventJson = objectMapper.writeValueAsString(event);
-            kafkaTemplate.send(KAFKA_TOPIC, event.repositoryName(), eventJson);
+            T event = objectMapper.readValue(payloadJson, eventClass);
+            String topicName = KAFKA_TOPIC_BASE + gitEventType;
+            kafkaTemplate.send(topicName, EVENT_KEY, event);
+            return "Event accepted";
         } catch (JsonProcessingException e) {
-            return "Event Error";
+            System.err.println("Json parse error: " + e.getMessage());
+            return "Json parse Error";
         }
-        return "Event accepted";
+    }
+
+    @PostMapping("/webhook")
+    public String handleGitEvent(@RequestBody String payloadJson,
+                                 @RequestHeader("X-GitHub-Event") String gitEventType){
+        System.out.println("New event with type: " + gitEventType);
+
+        return switch (gitEventType){
+            case "commit" -> handleAndSend(gitEventType, payloadJson, CommitEvent.class);
+            case "pull_request" -> handleAndSend(gitEventType, payloadJson, PullRequestEvent.class);
+            default -> "Unsupported event type: " + gitEventType;
+        };
     }
 }

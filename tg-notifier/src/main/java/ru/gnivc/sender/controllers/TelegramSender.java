@@ -1,4 +1,4 @@
-package Controllers;
+package ru.gnivc.sender.controllers;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.telegram.telegrambots.bots.DefaultBotOptions;

@@ -1,11 +1,11 @@
 package ru.gnivc.sender;
 
-import Controllers.TelegramSender;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import ru.gnivc.sender.controllers.TelegramSender;
 
 @SpringBootApplication
 public class NotifierApplication {

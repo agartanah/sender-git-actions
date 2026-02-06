@@ -1,6 +1,6 @@
 package ru.gnivc.sender.models;
 
-public record CommitEvent(
+public record PullRequestEvent(
         String repositoryName,
         String branch,
         String author,
