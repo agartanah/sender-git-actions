@@ -20,20 +20,18 @@ public class PullRequestListener {
     public PullRequestListener(TelegramSender telegramSender, ObjectMapper objectMapper) {
         this.telegramSender = telegramSender;
         this.objectMapper = objectMapper;
-        log.info("PullRequest listener is listening.");
     }
 
     @KafkaListener(topics = KAFKA_TOPIC, groupId = "pullRequest-group")
     public void listen(@Payload String event) {
-        try{
+        try {
             PullRequestEvent pullRequestEvent = objectMapper.readValue(event, PullRequestEvent.class);
 
-            String botMessage = "🔥 Новый пулреквест в GitHub 🔥"
-                    + "\nАвтор: " + pullRequestEvent.author()
-                    + "\nРепозиторий: " + pullRequestEvent.repositoryName()
-                    + "\nВетка: " + pullRequestEvent.branch()
-                    + "\nСообщение: " + pullRequestEvent.commitMessage()
-                    + "\nСсылка: " + pullRequestEvent.url();
+            String botMessage = "🔥 ПуллРеквест " + pullRequestEvent.getPullRequestTitle() + " #" + pullRequestEvent.number() +" 🔥"
+                    + "\nСостояние: " + pullRequestEvent.action()
+                    + "\nРепозиторий: " + pullRequestEvent.getRepositoryName()
+                    + "\nАвтор: " + pullRequestEvent.getAuthor()
+                    + "\n" + pullRequestEvent.getPullRequestUrl();
 
             telegramSender.sendMessageToChat(botMessage);
             System.out.println("✅ Message sent successfully.");

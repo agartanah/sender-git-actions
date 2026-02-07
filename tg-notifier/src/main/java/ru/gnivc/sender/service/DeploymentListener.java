@@ -8,32 +8,31 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 import ru.gnivc.sender.controllers.TelegramSender;
-import ru.gnivc.sender.models.CommitEvent;
+import ru.gnivc.sender.models.DeploymentEvent;
 
 @Component
-public class CommitListener {
-    private static final Logger log = LoggerFactory.getLogger(CommitListener.class);
+public class DeploymentListener {
+    private static final Logger log = LoggerFactory.getLogger(DeploymentListener.class);
     private final TelegramSender telegramSender;
-    private static final String KAFKA_TOPIC = "git.commit";
+    private static final String KAFKA_TOPIC = "git.deployment";
     private final ObjectMapper objectMapper;
 
-    public CommitListener(TelegramSender telegramSender, ObjectMapper objectMapper) {
+    public DeploymentListener(TelegramSender telegramSender, ObjectMapper objectMapper) {
         this.telegramSender = telegramSender;
         this.objectMapper = objectMapper;
-        log.info("Commit listener is listening.");
     }
 
-    @KafkaListener(topics = KAFKA_TOPIC, groupId = "commit-group")
+    @KafkaListener(topics = KAFKA_TOPIC, groupId = "deployment-group")
     public void listen(@Payload String event) {
         try{
-            CommitEvent commitEvent = objectMapper.readValue(event, CommitEvent.class);
+            DeploymentEvent deploymentEvent = objectMapper.readValue(event, DeploymentEvent.class);
 
-            String botMessage = "🔥 Новый коммит в GitHub 🔥"
-                    + "\nАвтор: " + commitEvent.author()
-                    + "\nРепозиторий: " + commitEvent.repositoryName()
-                    + "\nВетка: " + commitEvent.branch()
-                    + "\nСообщение: " + commitEvent.commitMessage()
-                    + "\nСсылка: " + commitEvent.url();
+            String botMessage = "🔥 Деплой 🔥"
+                    + "\nРепозиторий: " + deploymentEvent.getRepositoryName()
+                    + "\nСтатус: " + deploymentEvent.getStatus()
+                    + "\nСреда: " + deploymentEvent.getEnvironment()
+                    + "\nСделал деплой: " + deploymentEvent.getDeployer()
+                    + "\n" + deploymentEvent.getWorkflowRunUrl();
 
             telegramSender.sendMessageToChat(botMessage);
             System.out.println("✅ Message sent successfully.");
