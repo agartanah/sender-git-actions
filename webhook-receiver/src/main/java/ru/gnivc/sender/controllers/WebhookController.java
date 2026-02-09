@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.gnivc.sender.models.PullRequestEvent;
 
 @RestController
-@RequestMapping("/api/1")
+@RequestMapping("/webhook")
 public class WebhookController {
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private final ObjectMapper objectMapper;
@@ -33,7 +33,7 @@ public class WebhookController {
         }
     }
 
-    @PostMapping("/webhook")
+    @PostMapping("/github")
     public String handleGitEvent(@RequestBody String payloadJson,
                                  @RequestHeader("X-GitHub-Event") String gitEventType){
         System.out.println("New event with type: " + gitEventType);
