@@ -40,7 +40,7 @@ public class WebhookController {
 
         return switch (gitEventType){
             case "deployment" -> handleAndSend(gitEventType, payloadJson, DeploymentEvent.class);
-            case "pull_request" -> handleAndSend(gitEventType, payloadJson, Object.class);
+            case "pull_request" -> handleAndSend(gitEventType, payloadJson, PullRequestEvent.class);
             case "commit_comment" -> handleAndSend(gitEventType, payloadJson, CommitCommentEvent.class);
             default -> "Unsupported event type: " + gitEventType;
         };
