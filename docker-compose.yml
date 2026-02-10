@@ -15,11 +15,11 @@
       depends_on:
         - artemis
       ports:
-        - "8081:8081"
+        - "8084:8084"
 
     webhook:
       build: ./webhook-receiver
       depends_on:
         - artemis
       ports:
-        - "8082:8082"
+        - "8083:8083"
