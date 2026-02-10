@@ -1,0 +1,25 @@
+  version: "3.9"
+
+  services:
+    artemis:
+      image: apache/activemq-artemis:2.36.0
+      container_name: artemis
+      ports:
+        - "61616:61616"   # JMS
+        - "8161:8161"     # Web UI
+      environment:
+        ARTEMIS_USER: admin
+        ARTEMIS_PASSWORD: admin
+    notifier:
+      build: ./notifier
+      depends_on:
+        - artemis
+      ports:
+        - "8081:8081"
+
+    webhook:
+      build: ./webhook-receiver
+      depends_on:
+        - artemis
+      ports:
+        - "8082:8082"
