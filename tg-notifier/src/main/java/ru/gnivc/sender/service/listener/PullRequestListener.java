@@ -1,5 +1,7 @@
-package ru.gnivc.sender.service;
+package ru.gnivc.sender.service.listener;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -7,8 +9,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
-import ru.gnivc.sender.controllers.TelegramSender;
 import ru.gnivc.sender.models.PullRequestEvent;
+import ru.gnivc.sender.service.TelegramSender;
 
 @Component
 public class PullRequestListener {
@@ -27,11 +29,10 @@ public class PullRequestListener {
         try {
             PullRequestEvent pullRequestEvent = objectMapper.readValue(event, PullRequestEvent.class);
 
-            String botMessage = "🔥 ПуллРеквест " + pullRequestEvent.getPullRequestTitle() + " #" + pullRequestEvent.number() +" 🔥"
+            String botMessage = "🔥 ПуллРеквест " + pullRequestEvent.repositoryName() + " 🔥"
                     + "\nСостояние: " + pullRequestEvent.action()
-                    + "\nРепозиторий: " + pullRequestEvent.getRepositoryName()
-                    + "\nАвтор: " + pullRequestEvent.getAuthor()
-                    + "\n" + pullRequestEvent.getPullRequestUrl();
+                    + "\nАвтор: " + pullRequestEvent.author()
+                    + "\n" + pullRequestEvent.url();
 
             telegramSender.sendMessageToChat(botMessage);
             System.out.println("✅ Message sent successfully.");

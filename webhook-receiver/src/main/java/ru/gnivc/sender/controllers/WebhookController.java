@@ -2,7 +2,7 @@ package ru.gnivc.sender.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import ru.gnivc.sender.models.CommitCommentEvent;
+import ru.gnivc.sender.models.IssueCommentEvent;
 import ru.gnivc.sender.models.DeploymentEvent;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -33,15 +33,15 @@ public class WebhookController {
         }
     }
 
-    @PostMapping("/github")
+    @PostMapping("/cicd")
     public String handleGitEvent(@RequestBody String payloadJson,
-                                 @RequestHeader("X-GitHub-Event") String gitEventType){
+                                 @RequestHeader("CI-Event-Type") String gitEventType){
         System.out.println("New event with type: " + gitEventType);
 
         return switch (gitEventType){
             case "deployment" -> handleAndSend(gitEventType, payloadJson, DeploymentEvent.class);
             case "pull_request" -> handleAndSend(gitEventType, payloadJson, PullRequestEvent.class);
-            case "commit_comment" -> handleAndSend(gitEventType, payloadJson, CommitCommentEvent.class);
+            case "issue_comment" -> handleAndSend(gitEventType, payloadJson, IssueCommentEvent.class);
             default -> "Unsupported event type: " + gitEventType;
         };
     }
