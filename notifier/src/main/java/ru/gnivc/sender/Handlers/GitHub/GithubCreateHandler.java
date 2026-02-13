@@ -25,11 +25,9 @@ public class GithubCreateHandler implements IEventHandler {
             String branchName = payload.path("ref").asText();
             String author = payload.path("sender").path("login").asText();
 
-            String message = "Новая ветка <b>" + branchName + "</b> в репозитории:\n" +
+            return "Новая ветка <b>" + branchName + "</b> в репозитории:\n" +
                     repositoryUrl + "\n\nОТ: " + author + "\n\nССЫЛКА: \n" +
                     repositoryUrl + "/tree/" + branchName;
-
-            return message;
         } catch (Exception e) {
             System.out.println("Error build message for GitHub DELETE: " + e.getMessage());
             return "";

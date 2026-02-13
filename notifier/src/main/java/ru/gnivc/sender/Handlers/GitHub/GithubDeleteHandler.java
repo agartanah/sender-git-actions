@@ -25,10 +25,8 @@ public class GithubDeleteHandler implements IEventHandler {
             String branchName = payload.path("ref").asText();
             String author = payload.path("sender").path("login").asText();
 
-            String message = "Ветка <b>" + branchName + "</b> была удалена в репозитории:\n" +
+            return "Ветка <b>" + branchName + "</b> была удалена в репозитории:\n" +
                     repositoryUrl + "\n\nОТ: " + author;
-
-            return message;
         } catch (Exception e) {
             System.out.println("Error build message for GitHub CREATE: " + e.getMessage());
             return "";
