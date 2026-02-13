@@ -1,0 +1,33 @@
+name: CI Trigger - Push
+
+on:
+  push:
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Build commits JSON
+        id: build
+        run: |
+          COMMITS=$(jq -c '[.commits[] | {sha: .id, message: .message}]' < "$GITHUB_EVENT_PATH")
+
+          echo "COMMITS=$COMMITS" >> $GITHUB_ENV
+
+      - name: Run Docker trigger
+        run: |
+          COMMITS=$(jq -c '[.commits[] | {sha: .id, message: .message}]' < "$GITHUB_EVENT_PATH")
+
+          SAFE_COMMITS=$(printf '%s' "$COMMITS" | jq -Rs .)
+
+          SAFE_COMMITS=${SAFE_COMMITS:1:-1}
+
+          docker run --rm \
+            harsat/notification-sender:latest \
+            "https://flat-garlics-shop.loca.lt" \
+            "push" \
+            "$GITHUB_REPOSITORY" \
+            "$GITHUB_ACTOR" \
+            "$SAFE_COMMITS" \
+            "https://github.com/$GITHUB_REPOSITORY"

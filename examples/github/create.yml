@@ -1,0 +1,26 @@
+name: CI Trigger - Branch Create
+
+on:
+  create:
+
+jobs:
+  trigger:
+    if: github.event.ref_type == 'branch'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Extract branch name
+        run: |
+          BRANCH=$(jq -r '.ref' < "$GITHUB_EVENT_PATH")
+          echo "BRANCH=$BRANCH" >> $GITHUB_ENV
+
+      - name: Run Docker trigger
+        run: |
+          docker run --rm \
+            harsat/notification-sender:latest \
+            "https://flat-garlics-shop.loca.lt" \
+            "create" \
+            "$GITHUB_REPOSITORY" \
+            "$GITHUB_ACTOR" \
+            "$BRANCH" \
+            "https://github.com/$GITHUB_REPOSITORY"
