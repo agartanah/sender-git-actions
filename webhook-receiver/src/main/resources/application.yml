@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: webhook-receiver
+
+  artemis:
+    mode: native
+    broker-url: tcp://artemis:61616
+    user: admin
+    password: admin
+
+server:
+  port: 8083
