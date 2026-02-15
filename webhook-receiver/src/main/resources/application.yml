@@ -1,0 +1,10 @@
+spring:
+    application:
+        name: webhook-receiver
+    kafka:
+        bootstrap-servers: kafka:29092
+        producer:
+            value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+server:
+    port: 8081

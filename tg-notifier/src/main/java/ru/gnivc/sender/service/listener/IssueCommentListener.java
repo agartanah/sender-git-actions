@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
-import ru.gnivc.sender.models.IssueCommentEvent;
+import ru.gnivc.sender.dto.response.IssueCommentEvent;
 import ru.gnivc.sender.service.TelegramSender;
 
 @Component

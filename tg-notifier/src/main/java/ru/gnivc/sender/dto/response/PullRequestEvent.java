@@ -1,10 +1,10 @@
-package ru.gnivc.sender.models;
+package ru.gnivc.sender.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record IssueEvent(
+public record PullRequestEvent(
         @JsonProperty("repositoryName") String repositoryName,
         @JsonProperty("author") String author,
         @JsonProperty("eventMessage") String action,

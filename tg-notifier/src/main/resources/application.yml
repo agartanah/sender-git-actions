@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: webhook-receiver
+
+  kafka:
+    bootstrap-servers: kafka:29092
+    consumer:
+      auto-offset-reset: earliest
+
+server:
+  port: 8082
+
+telegram:
+  bot:
+    token: 5882882891:AAFkzETeHYzry3liTHl_XhTr_iCCAXNAv_g
+  chat:
+    id: -1003870496812

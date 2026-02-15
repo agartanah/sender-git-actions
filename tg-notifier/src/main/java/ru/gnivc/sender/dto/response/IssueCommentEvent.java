@@ -1,4 +1,4 @@
-package ru.gnivc.sender.models;
+package ru.gnivc.sender.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

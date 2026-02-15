@@ -7,10 +7,17 @@ AUTHOR=$4
 MESSAGE=$5
 URL=$6
 
+if [[ $MESSAGE == \{*\} ]]; then
+    EVENT_MESSAGE="$MESSAGE"
+else
+    MESSAGE_ESCAPED=$(echo "$MESSAGE" | sed 's/"/\\"/g')
+    EVENT_MESSAGE="\"$MESSAGE_ESCAPED\""
+fi
+
 PAYLOAD='{
   "repositoryName": "'"$REPO_NAME"'",
   "author": "'"$AUTHOR"'",
-  "eventMessage": "'"$MESSAGE"'",
+  "eventMessage": '"$EVENT_MESSAGE"',
   "eventUrl": "'"$URL"'"
 }'
 

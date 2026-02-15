@@ -1,12 +1,12 @@
-package ru.gnivc.sender.models;
+package ru.gnivc.sender.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record IssueCommentEvent(
+public record DeploymentEvent(
         @JsonProperty("repositoryName") String repositoryName,
-        @JsonProperty("author") String commentAuthor,
-        @JsonProperty("eventMessage") String message,
+        @JsonProperty("author") String deployer,
+        @JsonProperty("eventMessage") String environment,
         @JsonProperty("eventUrl") String url
 ) { }

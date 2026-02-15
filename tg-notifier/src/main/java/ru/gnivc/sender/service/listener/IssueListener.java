@@ -5,8 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
-import ru.gnivc.sender.models.IssueCommentEvent;
-import ru.gnivc.sender.models.IssueEvent;
+import ru.gnivc.sender.dto.response.IssueEvent;
 import ru.gnivc.sender.service.TelegramSender;
 
 @Component
@@ -25,14 +24,15 @@ public class IssueListener {
         try{
             IssueEvent issueEvent = objectMapper.readValue(event, IssueEvent.class);
 
-            String issueActionText = switch (issueEvent.action()) {
+            String issueActionText = switch (issueEvent.issueMessage().action()) {
                 case "opened" -> "Открыта";
                 case "closed" -> "Закрыта";
                 case "reopened" -> "Открыта повторно";
-                default -> issueEvent.action();
+                default -> issueEvent.issueMessage().action();
             };
 
-            String botMessage = "🔥 Проблема " + issueEvent.repositoryName() + " : " + issueActionText + " 🔥"
+            String botMessage = "🔥 Проблема " + issueEvent.issueMessage().issueTitle() + " #" + issueEvent.issueMessage().issueNumber() + " : " + issueActionText + " 🔥"
+                    + "\nРепозиторий: " + issueEvent.repositoryName()
                     + "\nСовершил действие: " + issueEvent.author()
                     + "\n" + issueEvent.url();
 

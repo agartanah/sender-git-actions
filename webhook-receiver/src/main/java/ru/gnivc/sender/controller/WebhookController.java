@@ -1,13 +1,13 @@
-package ru.gnivc.sender.controllers;
+package ru.gnivc.sender.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import ru.gnivc.sender.models.IssueCommentEvent;
-import ru.gnivc.sender.models.DeploymentEvent;
+import ru.gnivc.sender.dto.request.IssueCommentEvent;
+import ru.gnivc.sender.dto.request.DeploymentEvent;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
-import ru.gnivc.sender.models.IssueEvent;
-import ru.gnivc.sender.models.PullRequestEvent;
+import ru.gnivc.sender.dto.request.IssueEvent;
+import ru.gnivc.sender.dto.request.PullRequestEvent;
 
 @RestController
 @RequestMapping("/webhook")
