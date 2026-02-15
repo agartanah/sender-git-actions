@@ -2,8 +2,6 @@ package ru.gnivc.sender.service.listener;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
@@ -12,7 +10,6 @@ import ru.gnivc.sender.service.TelegramSender;
 
 @Component
 public class DeploymentListener {
-    private static final Logger log = LoggerFactory.getLogger(DeploymentListener.class);
     private final TelegramSender telegramSender;
     private static final String KAFKA_TOPIC = "git.deployment";
     private final ObjectMapper objectMapper;

@@ -6,6 +6,7 @@ import ru.gnivc.sender.models.IssueCommentEvent;
 import ru.gnivc.sender.models.DeploymentEvent;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
+import ru.gnivc.sender.models.IssueEvent;
 import ru.gnivc.sender.models.PullRequestEvent;
 
 @RestController
@@ -42,6 +43,7 @@ public class WebhookController {
             case "deployment" -> handleAndSend(gitEventType, payloadJson, DeploymentEvent.class);
             case "pull_request" -> handleAndSend(gitEventType, payloadJson, PullRequestEvent.class);
             case "issue_comment" -> handleAndSend(gitEventType, payloadJson, IssueCommentEvent.class);
+            case "issue" -> handleAndSend(gitEventType, payloadJson, IssueEvent.class);
             default -> "Unsupported event type: " + gitEventType;
         };
     }
