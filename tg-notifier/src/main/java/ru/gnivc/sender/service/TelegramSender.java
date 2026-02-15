@@ -5,6 +5,8 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import ru.gnivc.sender.util.ErrHandler;
+import ru.gnivc.sender.util.LogHandler;
 
 public class TelegramSender extends TelegramLongPollingBot {
     private final String BOT_TOKEN;
@@ -31,9 +33,9 @@ public class TelegramSender extends TelegramLongPollingBot {
         message.setText(text);
         try{
             execute(message);
-            System.out.println("Try to sent message");
+            System.out.println(LogHandler.TRY_SEND_MESSAGE);
         } catch (TelegramApiException e){
-            System.err.println("Failed to send message: " + e.getMessage());
+            System.err.println(ErrHandler.FAILED_SEND_MESSAGE + e.getMessage());
         }
     }
 }

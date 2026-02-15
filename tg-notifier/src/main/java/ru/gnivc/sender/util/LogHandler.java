@@ -1,0 +1,6 @@
+package ru.gnivc.sender.util;
+
+public class LogHandler {
+    public static final String TRY_SEND_MESSAGE = "Try to sent message";
+    public static final String MESSAGE_SEND_SUCCESS = "✅ Message send successfully";
+}

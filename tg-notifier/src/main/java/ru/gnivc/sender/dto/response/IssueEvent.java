@@ -17,4 +17,3 @@ public record IssueEvent(
             @JsonProperty("issueNumber") Integer issueNumber
     ) { }
 }
-

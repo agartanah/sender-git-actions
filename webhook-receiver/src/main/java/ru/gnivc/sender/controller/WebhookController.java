@@ -8,6 +8,8 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
 import ru.gnivc.sender.dto.request.IssueEvent;
 import ru.gnivc.sender.dto.request.PullRequestEvent;
+import ru.gnivc.sender.util.ErrHandler;
+import ru.gnivc.sender.util.LogHandler;
 
 @RestController
 @RequestMapping("/webhook")
@@ -22,28 +24,29 @@ public class WebhookController {
         this.objectMapper = objectMapper;
     }
 
-    private <T> String handleAndSend(String gitEventType, String payloadJson, Class<T> eventClass){
+    private <T> String sendEvent(String gitEventType, String payloadJson, Class<T> eventClass){
         try{
             T event = objectMapper.readValue(payloadJson, eventClass);
             String topicName = KAFKA_TOPIC_BASE + gitEventType;
             kafkaTemplate.send(topicName, EVENT_KEY, event);
-            return "Event accepted";
+            System.out.println(LogHandler.EVENT_SEND_TO_KAFKA);
+            return LogHandler.EVENT_ACCEPTED;
         } catch (JsonProcessingException e) {
-            System.err.println("Json parse error: " + e.getMessage());
-            return "Json parse Error";
+            System.err.println(ErrHandler.JSON_PARSE_ERROR + e.getMessage());
+            return ErrHandler.JSON_PARSE_ERROR;
         }
     }
 
     @PostMapping("/cicd")
     public String handleGitEvent(@RequestBody String payloadJson,
                                  @RequestHeader("CI-Event-Type") String gitEventType){
-        System.out.println("New event with type: " + gitEventType);
+        System.out.println(LogHandler.NEW_EVENT_WITH_TYPE + gitEventType);
 
         return switch (gitEventType){
-            case "deployment" -> handleAndSend(gitEventType, payloadJson, DeploymentEvent.class);
-            case "pull_request" -> handleAndSend(gitEventType, payloadJson, PullRequestEvent.class);
-            case "issue_comment" -> handleAndSend(gitEventType, payloadJson, IssueCommentEvent.class);
-            case "issue" -> handleAndSend(gitEventType, payloadJson, IssueEvent.class);
+            case "deployment" -> sendEvent(gitEventType, payloadJson, DeploymentEvent.class);
+            case "pull_request" -> sendEvent(gitEventType, payloadJson, PullRequestEvent.class);
+            case "issue_comment" -> sendEvent(gitEventType, payloadJson, IssueCommentEvent.class);
+            case "issue" -> sendEvent(gitEventType, payloadJson, IssueEvent.class);
             default -> "Unsupported event type: " + gitEventType;
         };
     }
