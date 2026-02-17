@@ -7,11 +7,11 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 import ru.gnivc.sender.dto.response.DeploymentEvent;
-import ru.gnivc.sender.dto.response.IssueCommentEvent;
 import ru.gnivc.sender.service.TelegramSender;
 import ru.gnivc.sender.util.ErrHandler;
 import ru.gnivc.sender.util.LogHandler;
 import jakarta.validation.Validator;
+import ru.gnivc.sender.util.TgMessageHandler;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -43,11 +43,7 @@ public class DeploymentListener {
                 return;
             }
 
-            String botMessage = "🔥 Деплой 🔥"
-                    + "\nРепозиторий: " + deploymentEvent.repositoryName()
-                    + "\nСостояние: " + deploymentEvent.environment()
-                    + "\nСделал деплой: " + deploymentEvent.deployer()
-                    + "\n" + deploymentEvent.url();
+            String botMessage = TgMessageHandler.createDeploymentMessage(deploymentEvent);
 
             telegramSender.sendMessageToChat(botMessage);
             System.out.println(LogHandler.MESSAGE_SEND_SUCCESS);

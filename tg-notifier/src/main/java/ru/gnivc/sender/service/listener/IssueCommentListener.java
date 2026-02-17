@@ -11,6 +11,7 @@ import ru.gnivc.sender.dto.response.IssueCommentEvent;
 import ru.gnivc.sender.service.TelegramSender;
 import ru.gnivc.sender.util.ErrHandler;
 import ru.gnivc.sender.util.LogHandler;
+import ru.gnivc.sender.util.TgMessageHandler;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -42,10 +43,7 @@ public class IssueCommentListener {
                 return;
             }
 
-            String botMessage = "🔥 Комментарий в " + issueCommentEvent.repositoryName() + " 🔥"
-                    + "\nКомментарий от: " + issueCommentEvent.commentAuthor()
-                    + "\n«" + issueCommentEvent.message() + "»"
-                    + "\n" + issueCommentEvent.url();
+            String botMessage = TgMessageHandler.createIssueCommentMessage(issueCommentEvent);
 
             telegramSender.sendMessageToChat(botMessage);
             System.out.println(LogHandler.MESSAGE_SEND_SUCCESS);

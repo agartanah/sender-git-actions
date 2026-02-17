@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
@@ -12,6 +11,7 @@ import ru.gnivc.sender.dto.response.IssueEvent;
 import ru.gnivc.sender.service.TelegramSender;
 import ru.gnivc.sender.util.ErrHandler;
 import ru.gnivc.sender.util.LogHandler;
+import ru.gnivc.sender.util.TgMessageHandler;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -44,27 +44,12 @@ public class IssueListener {
                 return;
             }
 
-            String botMessage = createBotMessage(issueEvent);
+            String botMessage = TgMessageHandler.createIssueMessage(issueEvent);
 
             telegramSender.sendMessageToChat(botMessage);
             System.out.println(LogHandler.MESSAGE_SEND_SUCCESS);
         } catch (JsonProcessingException e) {
             System.err.println(ErrHandler.JSON_PARSE_ERROR + e.getMessage());
         }
-    }
-
-    @NotNull
-    private static String createBotMessage(IssueEvent issueEvent) {
-        String issueActionText = switch (issueEvent.issueMessage().action()) {
-            case "opened" -> "Открыта";
-            case "closed" -> "Закрыта";
-            case "reopened" -> "Открыта повторно";
-            default -> issueEvent.issueMessage().action();
-        };
-
-        return "🔥 Проблема " + issueEvent.issueMessage().issueTitle() + " #" + issueEvent.issueMessage().issueNumber() + " : " + issueActionText + " 🔥"
-                + "\nРепозиторий: " + issueEvent.repositoryName()
-                + "\nСовершил действие: " + issueEvent.author()
-                + "\n" + issueEvent.url();
     }
 }
