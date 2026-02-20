@@ -6,12 +6,12 @@
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>3.5.10</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath/>
 	</parent>
 	<groupId>ru.gnivc</groupId>
-	<artifactId>notifier</artifactId>
+	<artifactId>webhook-notifier</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>notifier</name>
+	<name>webhook notifier</name>
 	<description>Notifier for git actions</description>
 	<url/>
 	<licenses>
