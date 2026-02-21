@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record DeploymentEvent(
+public record DeploymentDto(
         @JsonProperty("repositoryName")
         @NotBlank(message = "Repository cannot be blank")
         String repositoryName,

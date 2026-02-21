@@ -4,33 +4,32 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import ru.gnivc.sender.dto.request.IssueCommentEvent;
-import ru.gnivc.sender.dto.request.DeploymentEvent;
+import ru.gnivc.sender.dto.request.IssueCommentDto;
+import ru.gnivc.sender.dto.request.DeploymentDto;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
-import ru.gnivc.sender.dto.request.IssueEvent;
-import ru.gnivc.sender.util.ErrHandler;
-import ru.gnivc.sender.util.LogHandler;
+import ru.gnivc.sender.dto.request.IssueDto;
+import ru.gnivc.sender.util.ErrHandlerUtil;
+import ru.gnivc.sender.util.LogHandlerUtil;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/webhook")
+@RequiredArgsConstructor
 public class WebhookController {
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private final ObjectMapper objectMapper;
     private final Validator validator;
-    private static final String KAFKA_TOPIC_BASE = "git.";
-    private static final String EVENT_KEY = "default_notification_key";
-
-    public WebhookController(KafkaTemplate<String, Object> kafkaTemplate, ObjectMapper objectMapper, Validator validator) {
-        this.kafkaTemplate = kafkaTemplate;
-        this.objectMapper = objectMapper;
-        this.validator = validator;
-    }
+    @Value("${kafka.topic.base-prefix}")
+    private String KAFKA_TOPIC_BASE;
+    @Value("${kafka.default-key}")
+    private String EVENT_KEY;
 
     private <T> ResponseEntity<String> sendEvent(String gitEventType, String payloadJson, Class<T> eventClass){
         try{
@@ -43,34 +42,34 @@ public class WebhookController {
                         .collect(Collectors.joining(", "));
                 return ResponseEntity
                         .status(HttpStatus.BAD_REQUEST)
-                        .body(ErrHandler.VALIDATION_ERROR + errorMessage);
+                        .body(ErrHandlerUtil.VALIDATION_ERROR + errorMessage);
             }
 
             String topicName = KAFKA_TOPIC_BASE + gitEventType;
             kafkaTemplate.send(topicName, EVENT_KEY, event);
 
-            System.out.println(LogHandler.EVENT_SEND_TO_KAFKA);
+            System.out.println(LogHandlerUtil.EVENT_SEND_TO_KAFKA);
             return ResponseEntity
                     .status(HttpStatus.ACCEPTED)
-                    .body(LogHandler.EVENT_ACCEPTED);
+                    .body(LogHandlerUtil.EVENT_ACCEPTED);
         } catch (JsonProcessingException e) {
-            System.err.println(ErrHandler.JSON_PARSE_ERROR + e.getMessage());
+            System.err.println(ErrHandlerUtil.JSON_PARSE_ERROR + e.getMessage());
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body(ErrHandler.JSON_PARSE_ERROR + "Invalid payload structure");
+                    .body(ErrHandlerUtil.JSON_PARSE_ERROR + "Invalid payload structure");
         }
     }
 
     @PostMapping("/cicd")
-    public ResponseEntity<String> handleGitEvent(@RequestBody String payloadJson,
+    public ResponseEntity<String> handleEvent(@RequestBody String payloadJson,
                                          @RequestHeader("CI-Event-Type") String gitEventType){
-        System.out.println(LogHandler.NEW_EVENT_WITH_TYPE + gitEventType);
+        System.out.println(LogHandlerUtil.NEW_EVENT_WITH_TYPE + gitEventType);
 
         return switch (gitEventType){
-            case "deployment" -> sendEvent(gitEventType, payloadJson, DeploymentEvent.class);
-            case "issue_comment" -> sendEvent(gitEventType, payloadJson, IssueCommentEvent.class);
-            case "issue" -> sendEvent(gitEventType, payloadJson, IssueEvent.class);
-            default -> ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(ErrHandler.UNSUPPORTED_EVENT_TYPE + gitEventType);
+            case "deployment" -> sendEvent(gitEventType, payloadJson, DeploymentDto.class);
+            case "issue_comment" -> sendEvent(gitEventType, payloadJson, IssueCommentDto.class);
+            case "issue" -> sendEvent(gitEventType, payloadJson, IssueDto.class);
+            default -> ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(ErrHandlerUtil.UNSUPPORTED_EVENT_TYPE + gitEventType);
         };
     }
 }

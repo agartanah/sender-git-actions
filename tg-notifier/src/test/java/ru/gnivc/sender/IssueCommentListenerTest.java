@@ -11,9 +11,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ru.gnivc.sender.dto.response.IssueCommentEvent;
+import ru.gnivc.sender.dto.response.IssueCommentDto;
 import ru.gnivc.sender.service.TelegramSender;
-import ru.gnivc.sender.service.listener.IssueCommentListener;
+import ru.gnivc.sender.service.processor.IssueCommentListener;
 
 import static org.mockito.Mockito.*;
 
@@ -32,7 +32,7 @@ public class IssueCommentListenerTest {
         try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
             validator = factory.getValidator();
         }
-        issueCommentListener = new IssueCommentListener(telegramSender, objectMapper, validator);
+        issueCommentListener = new IssueCommentListener(telegramSender, validator, objectMapper);
     }
 
     @Test
@@ -46,18 +46,18 @@ public class IssueCommentListenerTest {
                 }
                 """;
 
-        IssueCommentEvent validEvent = new IssueCommentEvent(
+        IssueCommentDto validEvent = new IssueCommentDto(
                 "test repo",
                 "test user",
                 "This is a test comment",
                 "http://test.com"
         );
 
-        when(objectMapper.readValue(json, IssueCommentEvent.class)).thenReturn(validEvent);
+        when(objectMapper.readValue(json, IssueCommentDto.class)).thenReturn(validEvent);
 
         issueCommentListener.listen(json);
 
-        verify(objectMapper, times(1)).readValue(json, IssueCommentEvent.class);
+        verify(objectMapper, times(1)).readValue(json, IssueCommentDto.class);
         verify(telegramSender, times(1)).sendMessageToChat(argThat(message ->
                 message.contains("🔥 Комментарий в test repo 🔥") &&
                         message.contains("Комментарий от: test user") &&
@@ -70,7 +70,7 @@ public class IssueCommentListenerTest {
     void negativeDataTest_DoesNotSendMessage() throws Exception {
         String invalidJson = "{invalid json}";
 
-        when(objectMapper.readValue(invalidJson, IssueCommentEvent.class))
+        when(objectMapper.readValue(invalidJson, IssueCommentDto.class))
                 .thenThrow(new JsonProcessingException("Invalid JSON") {});
 
         issueCommentListener.listen(invalidJson);
@@ -88,14 +88,14 @@ public class IssueCommentListenerTest {
                 }
                 """;
 
-        IssueCommentEvent invalidEvent = new IssueCommentEvent(
+        IssueCommentDto invalidEvent = new IssueCommentDto(
                 null,
                 "test user",
                 "This is a test comment",
                 "http://test.com"
         );
 
-        when(objectMapper.readValue(json, IssueCommentEvent.class)).thenReturn(invalidEvent);
+        when(objectMapper.readValue(json, IssueCommentDto.class)).thenReturn(invalidEvent);
 
         issueCommentListener.listen(json);
 

@@ -5,15 +5,16 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import ru.gnivc.sender.util.ErrHandler;
-import ru.gnivc.sender.util.LogHandler;
+import ru.gnivc.sender.util.ErrHandlerUtil;
+import ru.gnivc.sender.util.LogHandlerUtil;
 
 public class TelegramSender extends TelegramLongPollingBot {
     private final String BOT_TOKEN;
     private final String CHAT_ID;
 
-    public TelegramSender(@Value("${telegram.bot.token}") String token,
-                          @Value("${telegram.chat.id}") String chatId){
+    public TelegramSender(
+            @Value("${telegram.bot.token}") String token,
+            @Value("${telegram.chat.id}") String chatId){
         super(token);
         this.BOT_TOKEN=token;
         this.CHAT_ID=chatId;
@@ -33,9 +34,9 @@ public class TelegramSender extends TelegramLongPollingBot {
         message.setText(text);
         try{
             execute(message);
-            System.out.println(LogHandler.TRY_SEND_MESSAGE);
+            System.out.println(LogHandlerUtil.TRY_SEND_MESSAGE);
         } catch (TelegramApiException e){
-            System.err.println(ErrHandler.FAILED_SEND_MESSAGE + e.getMessage());
+            System.err.println(ErrHandlerUtil.FAILED_SEND_MESSAGE + e.getMessage());
         }
     }
 }

@@ -9,12 +9,11 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.gnivc.sender.controller.WebhookController;
-import ru.gnivc.sender.dto.request.IssueEvent;
-import ru.gnivc.sender.util.LogHandler;
+import ru.gnivc.sender.dto.request.IssueDto;
+import ru.gnivc.sender.util.LogHandlerUtil;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -37,20 +36,20 @@ public class WebhookControllerUnitTest {
         String eventType = "issue";
         String payloadJson = "{\"repositoryName\":\"test name\",\"author\":\"test author\",\"eventMessage\":{\"action\":\"opened\",\"issueTitle\":\"test title\",\"issueNumber\":1},\"eventUrl\":\"http://test.com\"}";
 
-        IssueEvent mockEvent = new IssueEvent(
+        IssueDto mockEvent = new IssueDto(
                 "test name",
                 "test author",
-                new IssueEvent.IssueMessage("opened", "test title", 1),
+                new IssueDto.IssueMessage("opened", "test title", 1),
                 "http://test.com"
         );
 
-        when(objectMapper.readValue(payloadJson, IssueEvent.class)).thenReturn(mockEvent);
+        when(objectMapper.readValue(payloadJson, IssueDto.class)).thenReturn(mockEvent);
 
         mockMvc.perform(post("/webhook/cicd")
                         .header("CI-Event-Type", eventType)
                         .content(payloadJson))
                 .andExpect(status().isAccepted())
-                .andExpect(content().string(LogHandler.EVENT_ACCEPTED));
+                .andExpect(content().string(LogHandlerUtil.EVENT_ACCEPTED));
 
         verify(kafkaTemplate, times(1)).send(
                 eq(TOPIC_BASE + eventType),
@@ -64,7 +63,7 @@ public class WebhookControllerUnitTest {
         String eventType = "issue";
         String payloadJson = "{not json}";
 
-        when(objectMapper.readValue(payloadJson, IssueEvent.class))
+        when(objectMapper.readValue(payloadJson, IssueDto.class))
                 .thenThrow(new JsonProcessingException("Bad JSON") {});
 
         mockMvc.perform(post("/webhook/cicd")
@@ -92,14 +91,14 @@ public class WebhookControllerUnitTest {
             }
             """;
 
-        IssueEvent invalidEvent = new IssueEvent(
+        IssueDto invalidEvent = new IssueDto(
                 null,
                 "test author",
-                new IssueEvent.IssueMessage("opened", "test title", 1),
+                new IssueDto.IssueMessage("opened", "test title", 1),
                 "http://test.com"
         );
 
-        when(objectMapper.readValue(payloadJson, IssueEvent.class)).thenReturn(invalidEvent);
+        when(objectMapper.readValue(payloadJson, IssueDto.class)).thenReturn(invalidEvent);
 
         mockMvc.perform(post("/webhook/cicd")
                         .header("CI-Event-Type", eventType)

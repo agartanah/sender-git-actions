@@ -5,11 +5,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record IssueCommentEvent(
+public record DeploymentDto(
         @JsonProperty("repositoryName")
         @NotBlank(message = "Repository cannot be blank")
         String repositoryName,
-        @JsonProperty("author") String commentAuthor,
-        @JsonProperty("eventMessage") String message,
+        @JsonProperty("author") String deployer,
+        @JsonProperty("eventMessage") String environment,
         @JsonProperty("eventUrl") String url
 ) { }

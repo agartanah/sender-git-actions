@@ -11,9 +11,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ru.gnivc.sender.dto.response.IssueEvent;
+import ru.gnivc.sender.dto.response.IssueDto;
 import ru.gnivc.sender.service.TelegramSender;
-import ru.gnivc.sender.service.listener.IssueListener;
+import ru.gnivc.sender.service.processor.IssueListener;
 
 import static org.mockito.Mockito.*;
 
@@ -50,18 +50,18 @@ public class IssueListenerTest {
                 }
                 """;
 
-        IssueEvent validEvent = new IssueEvent(
+        IssueDto validEvent = new IssueDto(
                 "test repo",
                 "test author",
-                new IssueEvent.IssueMessage("opened", "test title", 1),
+                new IssueDto.IssueMessage("opened", "test title", 1),
                 "http://test.com"
         );
 
-        when(objectMapper.readValue(json, IssueEvent.class)).thenReturn(validEvent);
+        when(objectMapper.readValue(json, IssueDto.class)).thenReturn(validEvent);
 
         issueListener.listen(json);
 
-        verify(objectMapper, times(1)).readValue(json, IssueEvent.class);
+        verify(objectMapper, times(1)).readValue(json, IssueDto.class);
         verify(telegramSender, times(1)).sendMessageToChat(argThat(message ->
                 message.contains("🔥 Проблема test title #1 : Открыта 🔥") &&
                         message.contains("Репозиторий: test repo") &&
@@ -73,7 +73,7 @@ public class IssueListenerTest {
     @Test
     void negativeDataTest_DoesNotSendMessage() throws Exception {
         String invalidJson = "{invalid json}";
-        when(objectMapper.readValue(invalidJson, IssueEvent.class))
+        when(objectMapper.readValue(invalidJson, IssueDto.class))
                 .thenThrow(new JsonProcessingException("Invalid JSON") {});
 
         issueListener.listen(invalidJson);
@@ -94,14 +94,14 @@ public class IssueListenerTest {
                 }
                 """;
 
-        IssueEvent validEvent = new IssueEvent(
+        IssueDto validEvent = new IssueDto(
                 null,
                 "test author",
-                new IssueEvent.IssueMessage("opened", null, 1),
+                new IssueDto.IssueMessage("opened", null, 1),
                 "http://test.com"
         );
 
-        when(objectMapper.readValue(json, IssueEvent.class)).thenReturn(validEvent);
+        when(objectMapper.readValue(json, IssueDto.class)).thenReturn(validEvent);
 
         issueListener.listen(json);
 

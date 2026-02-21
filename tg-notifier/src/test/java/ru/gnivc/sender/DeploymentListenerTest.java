@@ -11,9 +11,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ru.gnivc.sender.dto.response.DeploymentEvent;
+import ru.gnivc.sender.dto.response.DeploymentDto;
 import ru.gnivc.sender.service.TelegramSender;
-import ru.gnivc.sender.service.listener.DeploymentListener;
+import ru.gnivc.sender.service.processor.DeploymentListener;
 
 import static org.mockito.Mockito.*;
 
@@ -32,7 +32,7 @@ public class DeploymentListenerTest {
         try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
             validator = factory.getValidator();
         }
-        deploymentListener = new DeploymentListener(telegramSender, objectMapper, validator);
+        deploymentListener = new DeploymentListener(telegramSender, validator, objectMapper);
     }
 
     @Test
@@ -46,18 +46,18 @@ public class DeploymentListenerTest {
                 }
                 """;
 
-        DeploymentEvent validEvent = new DeploymentEvent(
+        DeploymentDto validEvent = new DeploymentDto(
                 "test repo",
                 "test user",
                 "production",
                 "http://test.com"
         );
 
-        when(objectMapper.readValue(json, DeploymentEvent.class)).thenReturn(validEvent);
+        when(objectMapper.readValue(json, DeploymentDto.class)).thenReturn(validEvent);
 
         deploymentListener.listen(json);
 
-        verify(objectMapper, times(1)).readValue(json, DeploymentEvent.class);
+        verify(objectMapper, times(1)).readValue(json, DeploymentDto.class);
         verify(telegramSender, times(1)).sendMessageToChat(argThat(message ->
                 message.contains("🔥 Деплой 🔥") &&
                         message.contains("Репозиторий: test repo") &&
@@ -71,7 +71,7 @@ public class DeploymentListenerTest {
     void negativeDataTest_DoesNotSendMessage() throws Exception {
         String invalidJson = "{invalid json}";
 
-        when(objectMapper.readValue(invalidJson, DeploymentEvent.class))
+        when(objectMapper.readValue(invalidJson, DeploymentDto.class))
                 .thenThrow(new JsonProcessingException("Invalid JSON") {});
 
         deploymentListener.listen(invalidJson);
@@ -89,14 +89,14 @@ public class DeploymentListenerTest {
                 }
                 """;
 
-        DeploymentEvent invalidEvent = new DeploymentEvent(
+        DeploymentDto invalidEvent = new DeploymentDto(
                 null,
                 "test user",
                 "production",
                 "http://test.com"
         );
 
-        when(objectMapper.readValue(json, DeploymentEvent.class)).thenReturn(invalidEvent);
+        when(objectMapper.readValue(json, DeploymentDto.class)).thenReturn(invalidEvent);
 
         deploymentListener.listen(json);
 

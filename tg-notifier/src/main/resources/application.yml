@@ -7,6 +7,16 @@ spring:
     consumer:
       auto-offset-reset: earliest
 
+kafka:
+  topic:
+    deployment: git.deployment
+    issue-comment: git.issue_comment
+    issue: git.issue
+  group:
+    deployment: deployment-group
+    issue-comment: issueComment-group
+    issue: issue-group
+
 server:
   port: 8082
 
