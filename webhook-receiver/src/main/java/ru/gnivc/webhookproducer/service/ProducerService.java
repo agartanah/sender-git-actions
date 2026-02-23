@@ -4,9 +4,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.jms.Queue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 import ru.gnivc.webhookproducer.dto.EventMessageDto;
+import ru.gnivc.webhookproducer.util.EndpointsUtil;
+import ru.gnivc.webhookproducer.util.LoggingMessageUtil;
 
 @Service
 public class ProducerService {
@@ -20,20 +23,18 @@ public class ProducerService {
         this.queue = queue;
     }
 
-    public void sendAction(String source, String type, JsonNode payload) {
+    public ResponseEntity<String> sendAction(String source, String type, JsonNode payload) {
         try {
             jmsTemplate.convertAndSend(queue, new EventMessageDto(source, type, payload));
 
-            log.info("""
-                    Message sent:
-                        source: {}
-                        type: {}
-                        payload: {}
-                    """, source, type, payload);
-        } catch (Exception e) {
-            log.error("Error sending action. source={}, type={}", source, type, e);
+            log.info(LoggingMessageUtil.SEND_ACTION_INFO, source, type, payload);
 
-            throw e;
+            return ResponseEntity.ok(EndpointsUtil.RESPONSE_OK);
+        } catch (Exception e) {
+            log.error(LoggingMessageUtil.SEND_ACTION_ERROR, source, type, e);
+
+            return ResponseEntity.internalServerError()
+                    .body(EndpointsUtil.RESPONSE_SERVER_ERROR);
         }
     }
 }

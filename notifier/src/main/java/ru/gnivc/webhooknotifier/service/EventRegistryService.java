@@ -1,4 +1,4 @@
-package ru.gnivc.webhooknotifier.dispatch;
+package ru.gnivc.webhooknotifier.service;
 
 import org.springframework.stereotype.Component;
 
@@ -9,11 +9,11 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
-public class EventHandlerRegistry {
+public class EventRegistryService {
 
     private final Map<String, IEventHandler> handlers;
 
-    public EventHandlerRegistry(List<IEventHandler> handlers) {
+    public EventRegistryService(List<IEventHandler> handlers) {
         this.handlers = handlers.stream()
                 .collect(Collectors.toMap(
                         h -> h.source() + ":" + h.eventType(),

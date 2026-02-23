@@ -1,4 +1,4 @@
-package ru.gnivc.webhooknotifier.dispatch;
+package ru.gnivc.webhooknotifier.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 

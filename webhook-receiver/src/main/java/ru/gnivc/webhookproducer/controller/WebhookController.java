@@ -6,9 +6,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.gnivc.webhookproducer.service.ProducerService;
+import ru.gnivc.webhookproducer.util.EndpointsUtil;
+import ru.gnivc.webhookproducer.util.HeaderUtil;
+import ru.gnivc.webhookproducer.util.SourceUtil;
 
 @RestController
-@RequestMapping("/webhook")
+@RequestMapping(EndpointsUtil.ENDPOINT_WEBHOOK)
 public class WebhookController {
     private final ProducerService producerService;
     private static final Logger log = LoggerFactory.getLogger(WebhookController.class);
@@ -17,91 +20,39 @@ public class WebhookController {
         this.producerService = producerService;
     }
 
-    @PostMapping("/cicd")
+    @PostMapping(EndpointsUtil.ENDPOINT_WEBHOOK_CICD)
     public ResponseEntity<String> cicd(
-            @RequestHeader("CI-Event-Type") String event,
+            @RequestHeader(HeaderUtil.CICD) String event,
             @RequestBody JsonNode body
     ) {
-        log.info("Received CICD webhook. Event: {}", event);
-
-        try {
-            producerService.sendAction("cicd", event, body);
-
-            log.info("CICD event '{}' successfully sent to broker", event);
-
-            return ResponseEntity.ok("Event accepted");
-        } catch (Exception e) {
-            log.error("Failed to process CICD event '{}'", event, e);
-
-            return ResponseEntity.internalServerError()
-                    .body("Event error");
-        }
+        return producerService.sendAction(SourceUtil.CICD, event, body);
     }
 
 
-    @PostMapping("/github")
+    @PostMapping(EndpointsUtil.ENDPOINT_WEBHOOK_GITHUB)
     public ResponseEntity<String> webhookGithub(
-            @RequestHeader("X-GitHub-Event") String event,
+            @RequestHeader(HeaderUtil.GITHUB) String event,
             @RequestBody JsonNode body
     ) {
-        log.info("Received GitHub webhook. Event: {}", event);
-
-        try {
-            producerService.sendAction("github", event, body);
-
-            log.info("GitHub event '{}' successfully sent to broker", event);
-
-            return ResponseEntity.ok("Event " + event + " accepted");
-        } catch (Exception e) {
-            log.error("Failed to process GitHub event '{}'", event, e);
-
-            return ResponseEntity.internalServerError()
-                    .body("Event " + event + " error");
-        }
+        return producerService.sendAction(SourceUtil.GITHUB, event, body);
     }
 
 
-    @PostMapping("/gitlab")
+    @PostMapping(EndpointsUtil.ENDPOINT_WEBHOOK_GITLAB)
     public ResponseEntity<String> webhookGitlab(
-            @RequestHeader("X-GitLab-Event") String event,
+            @RequestHeader(HeaderUtil.GITLAB) String event,
             @RequestBody JsonNode body
     ) {
-        log.info("Received GitLab webhook. Event: {}", event);
-
-        try {
-            producerService.sendAction("gitlab", event, body);
-
-            log.info("GitLab event '{}' successfully sent to broker", event);
-
-            return ResponseEntity.ok("Event " + event + " accepted");
-        } catch (Exception e) {
-            log.error("Failed to process GitLab event '{}'", event, e);
-
-            return ResponseEntity.internalServerError()
-                    .body("Event " + event + " error");
-        }
+        return producerService.sendAction(SourceUtil.GITLAB, event, body);
     }
 
 
-    @PostMapping("/gitflic")
+    @PostMapping(EndpointsUtil.ENDPOINT_WEBHOOK_GITFLIC)
     public ResponseEntity<String> webhookGitflic(
-            @RequestHeader("X-GitFlic-Event") String event,
+            @RequestHeader(HeaderUtil.GITFLIC) String event,
             @RequestBody JsonNode body
     ) {
-        log.info("Received GitFlic webhook. Event: {}", event);
-
-        try {
-            producerService.sendAction("gitflic", event, body);
-
-            log.info("GitFlic event '{}' successfully sent to broker", event);
-
-            return ResponseEntity.ok("Event " + event + " accepted");
-        } catch (Exception e) {
-            log.error("Failed to process GitFlic event '{}'", event, e);
-
-            return ResponseEntity.internalServerError()
-                    .body("Event " + event + " error");
-        }
+        return producerService.sendAction(SourceUtil.GITFLIC, event, body);
     }
 
 }

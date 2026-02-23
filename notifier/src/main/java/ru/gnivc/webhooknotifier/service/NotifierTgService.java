@@ -5,6 +5,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import ru.gnivc.webhooknotifier.util.LoggingMessageUtil;
+import ru.gnivc.webhooknotifier.util.NotifierTgServiceUtil;
 
 import java.util.Map;
 
@@ -27,17 +29,19 @@ public class NotifierTgService {
 
     public void sendMessage(String text) {
         try {
-            String url = "https://api.telegram.org/bot" + botToken + "/sendMessage";
+            String url = String.format(NotifierTgServiceUtil.SEND_MESSAGE_URL_TEMPLATE, botToken);
+
             Map<String, Object> body = Map.of(
-                    "chat_id", chatId,
-                    "text", text,
-                    "parse_mode", "HTML"
+                    NotifierTgServiceUtil.CHAT_ID_FIELD, chatId,
+                    NotifierTgServiceUtil.TEXT_FIELD, text,
+                    NotifierTgServiceUtil.PARSE_MODE_FIELD, NotifierTgServiceUtil.PARSE_MODE_HTML
             );
+
             restTemplate.postForObject(url, body, String.class);
 
-            log.info("Telegram message sent successfully");
+            log.info(LoggingMessageUtil.NOTIFIER_TG_SERVICE_INFO);
         } catch (Exception e) {
-            log.error("Failed to send Telegram message", e);
+            log.error(LoggingMessageUtil.NOTIFIER_TG_SERVICE_ERROR, e);
         }
     }
 }
