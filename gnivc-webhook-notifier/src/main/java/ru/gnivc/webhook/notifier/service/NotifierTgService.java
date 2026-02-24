@@ -20,8 +20,8 @@ public class NotifierTgService {
     private final String chatId;
 
     public NotifierTgService(
-            @Value("${ru.gnivc.webhooknotifier.telegram.bot-token}") String botToken,
-            @Value("${ru.gnivc.webhooknotifier.telegram.chat-id}") String chatId
+            @Value("${ru.gnivc.webhook.notifier.telegram.bot-token}") String botToken,
+            @Value("${ru.gnivc.webhook.notifier.telegram.chat-id}") String chatId
     ) {
         this.botToken = botToken;
         this.chatId = chatId;

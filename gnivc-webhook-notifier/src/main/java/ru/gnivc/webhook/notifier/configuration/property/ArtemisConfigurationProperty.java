@@ -3,7 +3,7 @@ package ru.gnivc.webhook.notifier.configuration.property;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.jms.support.converter.MessageType;
 
-@ConfigurationProperties(prefix = "ru.gnivc.webhooknotifier.artemis")
+@ConfigurationProperties(prefix = "ru.gnivc.webhook.notifier.artemis")
 public class ArtemisConfigurationProperty {
 
     private String queueAddress;
