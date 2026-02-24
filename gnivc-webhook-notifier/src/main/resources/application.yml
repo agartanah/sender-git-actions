@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: notifier
+
+  artemis:
+    mode: native
+    broker-url: tcp://artemis:61616
+    user: admin
+    password: admin
+
+ru:
+  gnivc:
+    webhook:
+      notifier:
+
+        artemis:
+          queue-address: git-actions-notify
+          concurrency: 3-10
+
+        telegram:
+          bot-token: "8280644322:AAEE8xXfoXdM0np12f4d5ejCT-oP7w9dMP0"
+          chat-id: "-1003870496812"
+
+server:
+  port: 8084
