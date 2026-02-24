@@ -11,14 +11,14 @@
         ARTEMIS_USER: admin
         ARTEMIS_PASSWORD: admin
     notifier:
-      build: ./notifier
+      build: ./gnivc-webhook-notifier
       depends_on:
         - artemis
       ports:
         - "8084:8084"
 
     webhook:
-      build: ./webhook-receiver
+      build: ./gnivc-webhook-receiver
       depends_on:
         - artemis
       ports:
