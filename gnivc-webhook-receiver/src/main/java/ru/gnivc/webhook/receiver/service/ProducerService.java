@@ -12,6 +12,9 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import ru.gnivc.webhook.receiver.dto.request.DeploymentDto;
+import ru.gnivc.webhook.receiver.dto.request.IssueCommentDto;
+import ru.gnivc.webhook.receiver.dto.request.IssueDto;
 import ru.gnivc.webhook.receiver.util.ErrHandlerUtil;
 import ru.gnivc.webhook.receiver.util.LogHandlerUtil;
 
@@ -31,7 +34,7 @@ public class ProducerService {
     @Value("${kafka.default-key}")
     private String EVENT_KEY;
 
-    public <T> ResponseEntity<String> sendEvent(String eventType, String payloadJson, Class<T> eventClass) {
+    private  <T> ResponseEntity<String> sendEvent(String eventType, String payloadJson, Class<T> eventClass) {
         try {
             T event = objectMapper.readValue(payloadJson, eventClass);
 
@@ -59,5 +62,14 @@ public class ProducerService {
                     .status(HttpStatus.BAD_REQUEST)
                     .body(ErrHandlerUtil.JSON_PARSE_ERROR + "Invalid payload structure");
         }
+    }
+
+    public ResponseEntity<String> publishEvent(String eventType, String payloadJson){
+        return switch (eventType){
+            case "deployment" -> sendEvent(eventType, payloadJson, DeploymentDto.class);
+            case "issue_comment" -> sendEvent(eventType, payloadJson, IssueCommentDto.class);
+            case "issue" -> sendEvent(eventType, payloadJson, IssueDto.class);
+            default -> ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(ErrHandlerUtil.UNSUPPORTED_EVENT_TYPE + eventType);
+        };
     }
 }

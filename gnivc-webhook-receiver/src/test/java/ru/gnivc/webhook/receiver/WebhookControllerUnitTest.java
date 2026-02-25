@@ -12,9 +12,6 @@ import ru.gnivc.webhook.receiver.controller.WebhookController;
 import ru.gnivc.webhook.receiver.dto.request.IssueDto;
 import ru.gnivc.webhook.receiver.util.LogHandlerUtil;
 import ru.gnivc.webhook.receiver.service.ProducerService;
-import jakarta.validation.Validator;
-
-import java.util.Set;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
