@@ -12,16 +12,10 @@ import ru.gnivc.webhook.notifier.util.LogHandlerUtil;
 
 public class TelegramSenderService extends TelegramLongPollingBot {
     private static final Logger log = LoggerFactory.getLogger(TelegramSenderService.class);
-    private final String BOT_TOKEN;
-    private final String CHAT_ID;
-
-    public TelegramSenderService(
-            @Value("${telegram.bot.token}") String token,
-            @Value("${telegram.chat.id}") String chatId){
-        super(token);
-        this.BOT_TOKEN=token;
-        this.CHAT_ID=chatId;
-    }
+    @Value("${telegram.bot.token}")
+    private String BOT_TOKEN;
+    @Value("${telegram.chat.id}")
+    private String CHAT_ID;
 
     @Override
     public String getBotUsername() {
