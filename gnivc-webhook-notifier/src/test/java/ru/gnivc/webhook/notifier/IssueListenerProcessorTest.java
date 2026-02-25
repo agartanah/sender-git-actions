@@ -12,19 +12,19 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.gnivc.webhook.notifier.dto.response.IssueDto;
-import ru.gnivc.webhook.notifier.service.TelegramSender;
-import ru.gnivc.webhook.notifier.service.processor.IssueListener;
+import ru.gnivc.webhook.notifier.service.TelegramSenderService;
+import ru.gnivc.webhook.notifier.service.processor.IssueListenerProcessor;
 
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class IssueListenerTest {
+public class IssueListenerProcessorTest {
     @Mock
-    private TelegramSender telegramSender;
+    private TelegramSenderService telegramSenderService;
     @Mock
     private ObjectMapper objectMapper;
     @InjectMocks
-    private IssueListener issueListener;
+    private IssueListenerProcessor issueListenerProcessor;
 
     @BeforeEach
     void setUp() {
@@ -32,7 +32,7 @@ public class IssueListenerTest {
         try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
             validator = factory.getValidator();
         }
-        issueListener = new IssueListener(telegramSender, objectMapper, validator);
+        issueListenerProcessor = new IssueListenerProcessor(telegramSenderService, objectMapper, validator);
     }
 
     @Test
@@ -59,10 +59,10 @@ public class IssueListenerTest {
 
         when(objectMapper.readValue(json, IssueDto.class)).thenReturn(validEvent);
 
-        issueListener.listen(json);
+        issueListenerProcessor.listen(json);
 
         verify(objectMapper, times(1)).readValue(json, IssueDto.class);
-        verify(telegramSender, times(1)).sendMessageToChat(argThat(message ->
+        verify(telegramSenderService, times(1)).sendMessageToChat(argThat(message ->
                 message.contains("🔥 Проблема test title #1 : Открыта 🔥") &&
                         message.contains("Репозиторий: test repo") &&
                         message.contains("Совершил действие: test author") &&
@@ -76,9 +76,9 @@ public class IssueListenerTest {
         when(objectMapper.readValue(invalidJson, IssueDto.class))
                 .thenThrow(new JsonProcessingException("Invalid JSON") {});
 
-        issueListener.listen(invalidJson);
+        issueListenerProcessor.listen(invalidJson);
 
-        verify(telegramSender, never()).sendMessageToChat(anyString());
+        verify(telegramSenderService, never()).sendMessageToChat(anyString());
     }
 
     @Test
@@ -103,8 +103,8 @@ public class IssueListenerTest {
 
         when(objectMapper.readValue(json, IssueDto.class)).thenReturn(validEvent);
 
-        issueListener.listen(json);
+        issueListenerProcessor.listen(json);
 
-        verify(telegramSender, never()).sendMessageToChat(anyString());
+        verify(telegramSenderService, never()).sendMessageToChat(anyString());
     }
 }

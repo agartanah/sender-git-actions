@@ -11,20 +11,20 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ru.gnivc.webhook.notifier.dto.response.DeploymentDto;
-import ru.gnivc.webhook.notifier.service.TelegramSender;
-import ru.gnivc.webhook.notifier.service.processor.DeploymentListener;
+import ru.gnivc.webhook.notifier.dto.response.IssueCommentDto;
+import ru.gnivc.webhook.notifier.service.TelegramSenderService;
+import ru.gnivc.webhook.notifier.service.processor.IssueCommentListenerProcessor;
 
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class DeploymentListenerTest {
+public class IssueCommentListenerProcessorTest {
     @Mock
-    private TelegramSender telegramSender;
+    private TelegramSenderService telegramSenderService;
     @Mock
     private ObjectMapper objectMapper;
     @InjectMocks
-    private DeploymentListener deploymentListener;
+    private IssueCommentListenerProcessor issueCommentListenerProcessor;
 
     @BeforeEach
     void setUp() {
@@ -32,7 +32,7 @@ public class DeploymentListenerTest {
         try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
             validator = factory.getValidator();
         }
-        deploymentListener = new DeploymentListener(telegramSender, validator, objectMapper);
+        issueCommentListenerProcessor = new IssueCommentListenerProcessor(telegramSenderService, validator, objectMapper);
     }
 
     @Test
@@ -41,28 +41,27 @@ public class DeploymentListenerTest {
                 {
                     "repositoryName": "test repo",
                     "author": "test user",
-                    "eventMessage": "production",
+                    "eventMessage": "This is a test comment",
                     "eventUrl": "http://test.com"
                 }
                 """;
 
-        DeploymentDto validEvent = new DeploymentDto(
+        IssueCommentDto validEvent = new IssueCommentDto(
                 "test repo",
                 "test user",
-                "production",
+                "This is a test comment",
                 "http://test.com"
         );
 
-        when(objectMapper.readValue(json, DeploymentDto.class)).thenReturn(validEvent);
+        when(objectMapper.readValue(json, IssueCommentDto.class)).thenReturn(validEvent);
 
-        deploymentListener.listen(json);
+        issueCommentListenerProcessor.listen(json);
 
-        verify(objectMapper, times(1)).readValue(json, DeploymentDto.class);
-        verify(telegramSender, times(1)).sendMessageToChat(argThat(message ->
-                message.contains("🔥 Деплой 🔥") &&
-                        message.contains("Репозиторий: test repo") &&
-                        message.contains("Состояние: production") &&
-                        message.contains("Сделал деплой: test user") &&
+        verify(objectMapper, times(1)).readValue(json, IssueCommentDto.class);
+        verify(telegramSenderService, times(1)).sendMessageToChat(argThat(message ->
+                message.contains("🔥 Комментарий в test repo 🔥") &&
+                        message.contains("Комментарий от: test user") &&
+                        message.contains("«This is a test comment»") &&
                         message.contains("http://test.com")
         ));
     }
@@ -71,12 +70,12 @@ public class DeploymentListenerTest {
     void negativeDataTest_DoesNotSendMessage() throws Exception {
         String invalidJson = "{invalid json}";
 
-        when(objectMapper.readValue(invalidJson, DeploymentDto.class))
+        when(objectMapper.readValue(invalidJson, IssueCommentDto.class))
                 .thenThrow(new JsonProcessingException("Invalid JSON") {});
 
-        deploymentListener.listen(invalidJson);
+        issueCommentListenerProcessor.listen(invalidJson);
 
-        verify(telegramSender, never()).sendMessageToChat(anyString());
+        verify(telegramSenderService, never()).sendMessageToChat(anyString());
     }
 
     @Test
@@ -84,22 +83,22 @@ public class DeploymentListenerTest {
         String json = """
                 {
                     "author": "test user",
-                    "eventMessage": "production",
-                    "eventUrl": "http://test.com"
+                    "This is a test comment",
+                    "http://test.com"
                 }
                 """;
 
-        DeploymentDto invalidEvent = new DeploymentDto(
+        IssueCommentDto invalidEvent = new IssueCommentDto(
                 null,
                 "test user",
-                "production",
+                "This is a test comment",
                 "http://test.com"
         );
 
-        when(objectMapper.readValue(json, DeploymentDto.class)).thenReturn(invalidEvent);
+        when(objectMapper.readValue(json, IssueCommentDto.class)).thenReturn(invalidEvent);
 
-        deploymentListener.listen(json);
+        issueCommentListenerProcessor.listen(json);
 
-        verify(telegramSender, never()).sendMessageToChat(anyString());
+        verify(telegramSenderService, never()).sendMessageToChat(anyString());
     }
 }

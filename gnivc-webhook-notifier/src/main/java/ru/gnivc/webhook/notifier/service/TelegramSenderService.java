@@ -10,12 +10,12 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.gnivc.webhook.notifier.util.ErrHandlerUtil;
 import ru.gnivc.webhook.notifier.util.LogHandlerUtil;
 
-public class TelegramSender extends TelegramLongPollingBot {
-    private static final Logger log = LoggerFactory.getLogger(TelegramSender.class);
+public class TelegramSenderService extends TelegramLongPollingBot {
+    private static final Logger log = LoggerFactory.getLogger(TelegramSenderService.class);
     private final String BOT_TOKEN;
     private final String CHAT_ID;
 
-    public TelegramSender(
+    public TelegramSenderService(
             @Value("${telegram.bot.token}") String token,
             @Value("${telegram.chat.id}") String chatId){
         super(token);

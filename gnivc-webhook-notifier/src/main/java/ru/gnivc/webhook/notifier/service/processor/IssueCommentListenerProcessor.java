@@ -11,7 +11,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 import ru.gnivc.webhook.notifier.dto.response.IssueCommentDto;
-import ru.gnivc.webhook.notifier.service.TelegramSender;
+import ru.gnivc.webhook.notifier.service.TelegramSenderService;
 import ru.gnivc.webhook.notifier.util.ErrHandlerUtil;
 import ru.gnivc.webhook.notifier.util.LogHandlerUtil;
 import ru.gnivc.webhook.notifier.util.TgMessageUtil;
@@ -21,9 +21,9 @@ import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-public class IssueCommentListener {
-    private static final Logger log = LoggerFactory.getLogger(IssueCommentListener.class);
-    private final TelegramSender telegramSender;
+public class IssueCommentListenerProcessor {
+    private static final Logger log = LoggerFactory.getLogger(IssueCommentListenerProcessor.class);
+    private final TelegramSenderService telegramSenderService;
     private final Validator validator;
     private final ObjectMapper objectMapper;
 
@@ -43,7 +43,7 @@ public class IssueCommentListener {
 
             String botMessage = TgMessageUtil.createIssueCommentMessage(issueCommentDto);
 
-            telegramSender.sendMessageToChat(botMessage);
+            telegramSenderService.sendMessageToChat(botMessage);
             log.info(LogHandlerUtil.MESSAGE_SEND_SUCCESS);
         } catch (JsonProcessingException e) {
             log.error(ErrHandlerUtil.JSON_PARSE_ERROR + "{}", e.getMessage());
