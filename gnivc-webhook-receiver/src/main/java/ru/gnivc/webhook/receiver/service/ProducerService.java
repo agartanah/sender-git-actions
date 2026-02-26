@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.http.HttpStatus;
-import ru.gnivc.webhook.receiver.configuration.KafkaConfig;
+import ru.gnivc.webhook.receiver.configuration.property.KafkaProperty;
 import ru.gnivc.webhook.receiver.dto.request.DeploymentDto;
 import ru.gnivc.webhook.receiver.dto.request.IssueCommentDto;
 import ru.gnivc.webhook.receiver.dto.request.IssueDto;
@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class ProducerService {
-    private final KafkaConfig kafkaConfig;
+    private final KafkaProperty kafkaProperty;
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private final ObjectMapper objectMapper;
     private final Validator validator;
@@ -43,8 +43,8 @@ public class ProducerService {
                         .body(ErrHandlerUtil.VALIDATION_ERROR + errorMessage);
             }
 
-            String topicName = kafkaConfig.topicPrefix() + eventType;
-            kafkaTemplate.send(topicName, kafkaConfig.defaultKey(), event);
+            String topicName = kafkaProperty.topicPrefix() + eventType;
+            kafkaTemplate.send(topicName, kafkaProperty.defaultKey(), event);
 
             log.info(LogHandlerUtil.EVENT_SEND_TO_KAFKA);
             return ResponseEntity

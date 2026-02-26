@@ -1,9 +1,9 @@
-package ru.gnivc.webhook.notifier.configuration;
+package ru.gnivc.webhook.notifier.configuration.property;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "telegram")
-public record TelegramConfig(
+public record TelegramProperty(
         String botToken,
         String chatId
 ) { }
