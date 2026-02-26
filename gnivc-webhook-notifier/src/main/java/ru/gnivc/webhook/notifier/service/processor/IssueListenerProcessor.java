@@ -5,8 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
@@ -21,8 +20,8 @@ import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class IssueListenerProcessor {
-    private static final Logger log = LoggerFactory.getLogger(IssueListenerProcessor.class);
     private final TelegramSenderService telegramSenderService;
     private final ObjectMapper objectMapper;
     private final Validator validator;

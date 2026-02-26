@@ -7,8 +7,7 @@ spring:
             value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
 kafka:
-    topic:
-        base-prefix: git.
+    topic-prefix: git.
     default-key: default_notification_key
 
 server:

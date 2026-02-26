@@ -21,7 +21,5 @@ server:
   port: 8082
 
 telegram:
-  bot:
-    token: 5882882891:AAFkzETeHYzry3liTHl_XhTr_iCCAXNAv_g
-  chat:
-    id: -1003870496812
+  bot-token: 5882882891:AAFkzETeHYzry3liTHl_XhTr_iCCAXNAv_g
+  chat-id: -1003870496812
